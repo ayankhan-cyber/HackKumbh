@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EXAMVAULT - The Internet-Proof Examination System | Prototype & Presentation</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            vault: {
+              950: '#060A14',
+              900: '#0A0F1D',
+              850: '#0E172E',
+              800: '#14203E',
+              700: '#1E2E56',
+              cyan: '#00F0FF',
+              blue: '#0072FF',
+              green: '#00E676',
+              amber: '#FFB300',
+              red: '#FF3838'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #060A14;
+      color: #E2E8F0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+    }
+    .glow-cyan {
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.25);
+    }
+    .glow-green {
+      box-shadow: 0 0 25px rgba(0, 230, 118, 0.25);
+    }
+    .glow-border {
+      border: 1px solid rgba(0, 240, 255, 0.3);
+    }
+    .bg-grid {
+      background-size: 32px 32px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0A0F1D;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1E2E56;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00F0FF;
+    }
+    .slide-enter {
+      animation: fadeInSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes fadeInSlide {
+      from { opacity: 0; transform: translateY(12px) scale(0.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+  </style>
+</head>
+<body class="bg-grid min-h-screen flex flex-col selection:bg-cyan-500 selection:text-black">
+
+  <!-- Top Global Header -->
+  <header class="border-b border-vault-700/60 bg-vault-950/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Logo & Domain Badge -->
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchMainTab('deck')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-vault-cyan to-vault-blue p-0.5 flex items-center justify-center glow-cyan shadow-lg">
+          <div class="w-full h-full bg-vault-900 rounded-[10px] flex items-center justify-center">
+            <i data-lucide="shield-check" class="w-5 h-5 text-vault-cyan"></i>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="font-extrabold text-xl tracking-wider text-white">EXAM<span class="text-vault-cyan">VAULT</span></span>
+            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-vault-cyan/10 text-vault-cyan border border-vault-cyan/30">PS-2 Education</span>
+          </div>
+          <p class="text-[11px] text-gray-400 font-mono hidden sm:block">Internet-Proof Offline Examination Engine</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="flex items-center bg-vault-900/90 border border-vault-700/80 rounded-xl p-1 shadow-inner">
+        <button id="nav-deck" onclick="switchMainTab('deck')" class="nav-btn px-4 py-1.5 rounded-lg text-sm font-semibold transition-all flex items-center space-x-2 text-white bg-vault-700 shadow">
+          <i data-lucide="presentation" class="w-4 h-4 text-vault-cyan"></i>
+          <span>PPT Deck</span>
+        </button>
+        <button id="nav-student" onclick="switchMainTab('student')" class="nav-btn px-4 py-1.5 rounded-lg text-sm font-semibold transition-all flex items-center space-x-2 text-gray-400 hover:text-white">
+          <i data-lucide="graduation-cap" class="w-4 h-4 text-emerald-400"></i>
+          <span>Student Exam</span>
+        </button>
+        <button id="nav-teacher" onclick="switchMainTab('teacher')" class="nav-btn px-4 py-1.5 rounded-lg text-sm font-semibold transition-all flex items-center space-x-2 text-gray-400 hover:text-white">
+          <i data-lucide="layout-dashboard" class="w-4 h-4 text-amber-400"></i>
+          <span>Teacher Hub</span>
+        </button>
+        <button id="nav-lab" onclick="switchMainTab('lab')" class="nav-btn px-4 py-1.5 rounded-lg text-sm font-semibold transition-all flex items-center space-x-2 text-gray-400 hover:text-white">
+          <i data-lucide="cpu" class="w-4 h-4 text-purple-400"></i>
+          <span>CRDT Sandbox</span>
+        </button>
+      </nav>
+
+      <!-- Network Simulator Switch & Vault Tools -->
+      <div class="flex items-center space-x-3">
+        <!-- Live Network Toggle -->
+        <div class="flex items-center bg-vault-900 border border-vault-700 rounded-xl px-3 py-1.5 shadow-sm">
+          <div class="flex items-center space-x-2 mr-3">
+            <span id="network-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span id="network-text" class="text-xs font-mono font-semibold text-emerald-400">ONLINE</span>
+          </div>
+          <button id="network-toggle-btn" onclick="toggleNetworkSimulation()" 
+                  class="text-[11px] font-bold px-2.5 py-1 rounded-md bg-vault-800 hover:bg-vault-700 text-gray-300 border border-vault-600 transition flex items-center space-x-1">
+            <i data-lucide="wifi" class="w-3.5 h-3.5"></i>
+            <span>Cut Wi-Fi</span>
+          </button>
+        </div>
+
+        <!-- Local Vault Inspector Button -->
+        <button onclick="toggleVaultDrawer()" title="Inspect IndexedDB & Cryptographic State" 
+                class="bg-vault-900 hover:bg-vault-800 text-vault-cyan border border-vault-cyan/30 rounded-xl p-2 transition flex items-center space-x-1 text-xs font-mono">
+          <i data-lucide="database" class="w-4 h-4"></i>
+          <span class="hidden md:inline">Inspect Vault</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Offline Warning Banner (Triggered when offline) -->
+  <div id="offline-alert-banner" class="hidden bg-gradient-to-r from-amber-950/90 via-amber-900/80 to-amber-950/90 border-b border-amber-500/40 px-4 py-2 text-center text-xs font-medium text-amber-200">
+    <div class="max-w-7xl mx-auto flex items-center justify-center space-x-2">
+      <i data-lucide="wifi-off" class="w-4 h-4 text-amber-400 animate-bounce"></i>
+      <span><strong>INTERNET DISCONNECTED:</strong> ExamVault Local Shield is active! Answers are being encrypted (AES-256) into IndexedDB. Zero progress lost.</span>
+      <span id="offline-queue-badge" class="ml-2 px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-[10px] font-mono text-amber-300">0 queued</span>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
+
+    <!-- ========================================================================= -->
+    <!-- TAB 1: PRESENTATION SLIDE DECK (PPT ROUND MODE)                           -->
+    <!-- ========================================================================= -->
+    <section id="tab-deck" class="tab-content block">
+      
+      <!-- Presentation Controller Bar -->
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-4 bg-vault-900/90 border border-vault-700 rounded-2xl p-4 shadow-lg">
+        <div class="flex items-center space-x-3">
+          <span class="px-2.5 py-1 rounded-md bg-vault-cyan/10 border border-vault-cyan/30 text-vault-cyan text-xs font-mono font-bold">
+            SLIDE <span id="current-slide-num">1</span> / <span id="total-slides-num">10</span>
+          </span>
+          <h2 id="slide-nav-title" class="text-sm font-semibold text-gray-200 truncate max-w-md hidden md:block">
+            Project Proposal Overview
+          </h2>
+        </div>
+
+        <!-- Slide Controls -->
+        <div class="flex items-center space-x-2">
+          <button onclick="prevSlide()" class="p-2 rounded-lg bg-vault-800 hover:bg-vault-700 text-gray-300 border border-vault-700 transition" title="Previous Slide (Arrow Left)">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+          </button>
+          <button onclick="nextSlide()" class="p-2 rounded-lg bg-vault-800 hover:bg-vault-700 text-gray-300 border border-vault-700 transition" title="Next Slide (Arrow Right)">
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+          <button onclick="toggleSpeakerNotes()" id="notes-toggle-btn" class="px-3 py-1.5 rounded-lg bg-vault-800 hover:bg-vault-700 text-gray-300 border border-vault-700 text-xs font-semibold flex items-center space-x-1.5 transition">
+            <i data-lucide="message-square-text" class="w-3.5 h-3.5 text-vault-cyan"></i>
+            <span>Speaker Pitch Notes</span>
+          </button>
+          <a href="/api/download-pptx" download="EXAMVAULT_Presentation_Deck.pptx" 
+             class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-bold text-xs flex items-center space-x-1.5 shadow-md transition">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span>Download .PPTX</span>
+          </a>
+          <button onclick="switchMainTab('student')" class="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs flex items-center space-x-1.5 shadow-md transition">
+            <i data-lucide="play" class="w-3.5 h-3.5 fill-black"></i>
+            <span>Launch Live Demo</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Slide Viewport (16:9 Aspect Ratio Container) -->
+      <div class="relative bg-vault-900 border border-vault-700/80 rounded-3xl p-6 sm:p-10 shadow-2xl min-h-[580px] flex flex-col justify-between overflow-hidden glow-border">
+        
+        <!-- Watermark / Background Glows -->
+        <div class="absolute -right-20 -top-20 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Dynamic Slide Content Injected Here -->
+        <div id="slide-container" class="slide-enter flex-1">
+          <!-- Injected via JS -->
+        </div>
+
+        <!-- Slide Footer Info -->
+        <div class="mt-8 pt-4 border-t border-vault-800 flex items-center justify-between text-xs text-gray-500 font-mono">
+          <div class="flex items-center space-x-4">
+            <span class="text-vault-cyan font-bold">YCCE Hackathon 2025</span>
+            <span>•</span>
+            <span>PS-2: Education Domain</span>
+            <span>•</span>
+            <span class="text-gray-400">Team EXAMVAULT</span>
+          </div>
+          <div>Use <kbd class="px-1.5 py-0.5 rounded bg-vault-800 border border-vault-700 text-gray-300">←</kbd> <kbd class="px-1.5 py-0.5 rounded bg-vault-800 border border-vault-700 text-gray-300">→</kbd> keys to navigate</div>
+        </div>
+      </div>
+
+      <!-- Speaker Notes Collapsible Drawer -->
+      <div id="speaker-notes-box" class="mt-4 bg-vault-850 border border-vault-cyan/30 rounded-2xl p-5 shadow-lg">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center space-x-2 text-vault-cyan font-bold text-sm">
+            <i data-lucide="mic" class="w-4 h-4"></i>
+            <span>Judge Presentation Script & Pitch Talking Points (Slide <span id="notes-slide-num">1</span>)</span>
+          </div>
+          <span class="text-[11px] font-mono text-gray-400">Read this during your 5-minute presentation</span>
+        </div>
+        <p id="speaker-notes-text" class="text-sm text-gray-300 leading-relaxed font-sans">
+          <!-- Injected via JS -->
+        </p>
+      </div>
+
+      <!-- Slide Quick Thumbnail Bar -->
+      <div class="mt-6 grid grid-cols-5 md:grid-cols-10 gap-2">
+        <template id="thumb-template">
+          <button class="thumb-btn p-2 rounded-xl border border-vault-800 bg-vault-900/60 hover:border-vault-cyan text-left transition">
+            <span class="block text-[10px] font-mono font-bold text-gray-400">#</span>
+            <span class="block text-[11px] font-semibold text-gray-200 truncate"></span>
+          </button>
+        </template>
+        <div id="thumbnails-container" class="contents"></div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 2: STUDENT EXAM PORTAL (LIVE WORKING PROTOTYPE)                       -->
+    <!-- ========================================================================= -->
+    <section id="tab-student" class="tab-content hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Left / Main: Exam Interface -->
+        <div class="lg:col-span-2 space-y-4">
+          
+          <!-- Exam Header & Live Controls -->
+          <div class="bg-vault-900 border border-vault-700/80 rounded-2xl p-5 shadow-lg flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center space-x-2">
+                <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold uppercase font-mono">Exam in Progress</span>
+                <span class="text-xs text-gray-400 font-mono">Student ID: <strong id="student-display-id" class="text-gray-200">CS25-4081</strong></span>
+              </div>
+              <h1 id="exam-display-title" class="text-lg font-bold text-white mt-1">CS 101: Distributed Systems & Data Structures</h1>
+            </div>
+
+            <div class="flex items-center space-x-4">
+              <!-- Tamper-Proof Monotonic Countdown Timer -->
+              <div class="text-right">
+                <span class="text-[10px] uppercase font-mono tracking-wider text-gray-400 block">Monotonic Timer</span>
+                <div class="flex items-center space-x-1.5 font-mono text-xl font-bold text-vault-cyan">
+                  <i data-lucide="timer" class="w-4 h-4"></i>
+                  <span id="exam-timer">28:45</span>
+                </div>
+              </div>
+
+              <!-- Crash Simulation Button -->
+              <button onclick="simulateBrowserCrash()" 
+                      class="px-3 py-2 rounded-xl bg-vault-800 hover:bg-vault-700 text-amber-300 border border-amber-500/30 text-xs font-semibold flex items-center space-x-1.5 shadow transition">
+                <i data-lucide="zap-off" class="w-3.5 h-3.5"></i>
+                <span>Simulate Crash</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Question Display Card -->
+          <div id="exam-card" class="bg-vault-900 border border-vault-700/80 rounded-2xl p-6 sm:p-8 shadow-xl relative min-h-[380px] flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-4 mb-4 border-b border-vault-800">
+                <span class="text-xs font-mono font-bold text-vault-cyan px-2.5 py-1 rounded-md bg-vault-cyan/10 border border-vault-cyan/30">
+                  Question <span id="current-q-index">1</span> of <span id="total-q-count">3</span>
+                </span>
+                <span class="text-xs font-mono text-gray-400">Marks: <strong id="q-marks" class="text-emerald-400">10</strong></span>
+              </div>
+
+              <!-- Question text -->
+              <h2 id="q-question-text" class="text-base sm:text-lg font-semibold text-gray-100 leading-relaxed mb-6">
+                <!-- Injected via JS -->
+              </h2>
+
+              <!-- Options -->
+              <div id="q-options-container" class="space-y-3">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+
+            <!-- Question Bottom Actions & Auto-save Status -->
+            <div class="pt-6 mt-6 border-t border-vault-800 flex flex-wrap items-center justify-between gap-4">
+              <div class="flex items-center space-x-2 text-xs font-mono text-gray-400">
+                <span id="autosave-dot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span id="autosave-label">Vault Encrypted & Synced</span>
+              </div>
+
+              <div class="flex items-center space-x-3">
+                <button id="btn-prev-q" onclick="navigateQuestion(-1)" class="px-4 py-2 rounded-xl bg-vault-800 hover:bg-vault-700 text-gray-300 text-xs font-semibold border border-vault-700 transition">
+                  Previous
+                </button>
+                <button id="btn-next-q" onclick="navigateQuestion(1)" class="px-4 py-2 rounded-xl bg-vault-800 hover:bg-vault-700 text-gray-300 text-xs font-semibold border border-vault-700 transition">
+                  Next Question
+                </button>
+                <button onclick="submitExamFinal()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-black font-extrabold text-xs shadow-lg transition flex items-center space-x-1.5">
+                  <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                  <span>Submit Exam</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Question Palette / Quick Jumper -->
+          <div class="bg-vault-900 border border-vault-700/80 rounded-2xl p-4 shadow flex items-center justify-between">
+            <span class="text-xs font-mono text-gray-400 uppercase tracking-wider">Question Navigator:</span>
+            <div id="q-palette" class="flex space-x-2">
+              <!-- Buttons injected via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Security, Sync Status & Live Cryptographic Monitor -->
+        <div class="space-y-4">
+          
+          <!-- Offline Shield Status Card -->
+          <div class="bg-vault-900 border border-vault-700/80 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                <i data-lucide="shield" class="w-4 h-4 text-vault-cyan"></i>
+                <span>Client Security Shield</span>
+              </h3>
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            </div>
+
+            <div class="space-y-2.5 text-xs">
+              <div class="flex justify-between items-center py-1 border-b border-vault-800">
+                <span class="text-gray-400">IndexedDB Storage</span>
+                <span class="font-mono text-emerald-400 font-bold">Encrypted (AES-GCM)</span>
+              </div>
+              <div class="flex justify-between items-center py-1 border-b border-vault-800">
+                <span class="text-gray-400">Conflict Engine</span>
+                <span class="font-mono text-vault-cyan font-bold">Lamport + CRDT</span>
+              </div>
+              <div class="flex justify-between items-center py-1 border-b border-vault-800">
+                <span class="text-gray-400">Submission Guard</span>
+                <span class="font-mono text-purple-400 font-bold">Idempotent Nonce</span>
+              </div>
+              <div class="flex justify-between items-center py-1 border-b border-vault-800">
+                <span class="text-gray-400">Device Clock Tamper</span>
+                <span class="font-mono text-emerald-400 font-bold">Immune (Monotonic)</span>
+              </div>
+              <div class="flex justify-between items-center py-1">
+                <span class="text-gray-400">Offline Sync Queue</span>
+                <span id="right-queue-count" class="font-mono text-amber-400 font-bold">0 Pending</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Cryptographic State Hash Chain -->
+          <div class="bg-vault-900 border border-vault-700/80 rounded-2xl p-5 shadow-lg">
+            <h3 class="text-sm font-bold text-white mb-2 flex items-center space-x-2">
+              <i data-lucide="link" class="w-4 h-4 text-purple-400"></i>
+              <span>Tamper-Evident Hash Chain</span>
+            </h3>
+            <p class="text-[11px] text-gray-400 mb-3">Every local answer recalculates an unforgeable SHA-256 state chain.</p>
+            <div class="bg-vault-950 rounded-xl p-3 border border-vault-800 font-mono text-[10px] space-y-1">
+              <div class="text-gray-500">CURRENT_CHAIN_HASH:</div>
+              <div id="live-hash-chain" class="text-vault-cyan break-all">0x8f2d91a7e4b5c682...</div>
+              <div class="text-gray-500 mt-2">LAMPORT_CLOCK_TICK:</div>
+              <div id="live-lamport-val" class="text-emerald-400 font-bold">Clock: 0</div>
+            </div>
+          </div>
+
+          <!-- Hackathon Demo Actions Card -->
+          <div class="bg-vault-850 border border-vault-cyan/30 rounded-2xl p-5 shadow-lg">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-vault-cyan mb-2">Hackathon Demo Shortcuts</h3>
+            <p class="text-[11px] text-gray-300 mb-3">Click these during the judge round to prove real-world resilience:</p>
+            <div class="space-y-2">
+              <button onclick="simulateNetworkDisconnectDemo()" class="w-full py-2 px-3 rounded-lg bg-vault-800 hover:bg-vault-700 text-amber-300 border border-amber-500/30 text-xs font-semibold text-left flex items-center justify-between transition">
+                <span>1. Cut Internet & Answer Offline</span>
+                <i data-lucide="wifi-off" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="simulateBrowserCrash()" class="w-full py-2 px-3 rounded-lg bg-vault-800 hover:bg-vault-700 text-cyan-300 border border-cyan-500/30 text-xs font-semibold text-left flex items-center justify-between transition">
+                <span>2. Hard Crash & Zero-Loss Recovery</span>
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="simulateReconnectSyncDemo()" class="w-full py-2 px-3 rounded-lg bg-vault-800 hover:bg-vault-700 text-emerald-300 border border-emerald-500/30 text-xs font-semibold text-left flex items-center justify-between transition">
+                <span>3. Reconnect & Auto-Sync Engine</span>
+                <i data-lucide="refresh-ccw" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="simulateSpamSubmitDemo()" class="w-full py-2 px-3 rounded-lg bg-vault-800 hover:bg-vault-700 text-purple-300 border border-purple-500/30 text-xs font-semibold text-left flex items-center justify-between transition">
+                <span>4. Test Duplicate Spam Submission</span>
+                <i data-lucide="copy-check" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 3: TEACHER / EXAMINER PORTAL                                         -->
+    <!-- ========================================================================= -->
+    <section id="tab-teacher" class="tab-content hidden">
+      <div class="space-y-6">
+        
+        <!-- Teacher Dashboard Header Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-vault-900 border border-vault-700/80 rounded-2xl p-4 shadow">
+            <span class="text-xs text-gray-400 font-mono">Active Exams</span>
+            <div id="stat-active-exams" class="text-2xl font-bold text-white mt-1">1</div>
+          </div>
+          <div class="bg-vault-900 border border-vault-700/80 rounded-2xl p-4 shadow">
+            <span class="text-xs text-gray-400 font-mono">Verified Submissions</span>
+            <div id="stat-submissions" class="text-2xl font-bold text-emerald-400 mt-1">0</div>
+          </div>
+          <div class="bg-vault-900 border border-vault-700/80 rounded-2xl p-4 shadow">
+            <span class="text-xs text-gray-400 font-mono">Conflicts Resolved</span>
+            <div id="stat-conflicts" class="text-2xl font-bold text-vault-cyan mt-1">0</div>
+          </div>
+          <div class="bg-vault-900 border border-vault-700/80 rounded-2xl p-4 shadow">
+            <span class="text-xs text-gray-400 font-mono">Duplicates Blocked</span>
+            <div id="stat-duplicates" class="text-2xl font-bold text-purple-400 mt-1">0</div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- Exam Creation Form (Problem Statement Requirement: Quiz Creation) -->
+          <div class="bg-vault-900 border border-vault-700/80 rounded-2xl p-6 shadow-xl">
+            <div class="flex items-center space-x-2 mb-4 pb-3 border-b border-vault-800">
+              <i data-lucide="plus-circle" class="w-5 h-5 text-vault-cyan"></i>
+              <h2 class="text-base font-bold text-white">Create New Quiz / Exam</h2>
+            </div>
+            
+            <form id="create-exam-form" onsubmit="handleCreateExam(event)" class="space-y-4">
+              <div>
+                <label class="block text-xs font-mono text-gray-400 mb-1">Exam Title</label>
+                <input type="text" id="new-exam-title" required value="Data Structures & Algorithms Test" 
+                       class="w-full bg-vault-950 border border-vault-700 rounded-xl px-3 py-2 text-xs text-gray-200 focus:outline-none focus:border-vault-cyan">
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-mono text-gray-400 mb-1">Duration (Mins)</label>
+                  <input type="number" id="new-exam-duration" required value="20" min="5" 
+                         class="w-full bg-vault-950 border border-vault-700 rounded-xl px-3 py-2 text-xs text-gray-200 focus:outline-none focus:border-vault-cyan">
+                </div>
+                <div>
+                  <label class="block text-xs font-mono text-gray-400 mb-1">Security Passkey</label>
+                  <input type="text" id="new-exam-passkey" required value="EXAM2025" 
+                         class="w-full bg-vault-950 border border-vault-700 rounded-xl px-3 py-2 text-xs text-gray-200 focus:outline-none focus:border-vault-cyan">
+                </div>
+              </div>
+              
+              <div>
+                <label class="block text-xs font-mono text-gray-400 mb-1">Sample Question 1</label>
+                <input type="text" id="new-q-text" required value="Which data structure provides O(1) average lookup time?" 
+                       class="w-full bg-vault-950 border border-vault-700 rounded-xl px-3 py-2 text-xs text-gray-200 focus:outline-none focus:border-vault-cyan">
+              </div>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <input type="text" id="new-opt-0" value="Hash Table" placeholder="Option 0" class="bg-vault-950 border border-vault-700 rounded-lg p-2 text-gray-300">
+                <input type="text" id="new-opt-1" value="Binary Search Tree" placeholder="Option 1" class="bg-vault-950 border border-vault-700 rounded-lg p-2 text-gray-300">
+                <input type="text" id="new-opt-2" value="Linked List" placeholder="Option 2" class="bg-vault-950 border border-vault-700 rounded-lg p-2 text-gray-300">
+                <input type="text" id="new-opt-3" value="Array" placeholder="Option 3" class="bg-vault-950 border border-vault-700 rounded-lg p-2 text-gray-300">
+              </div>
+
+              <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-extrabold text-xs shadow-md transition flex items-center justify-center space-x-1.5">
+                <i data-lucide="send" class="w-4 h-4"></i>
+                <span>Publish Exam to Offline Vault</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Real-Time Submissions Ledger & Conflict Resolution Audit -->
+          <div class="lg:col-span-2 space-y-4">
+            
+            <div class="bg-vault-900 border border-vault-700/80 rounded-2xl p-6 shadow-xl">
+              <div class="flex items-center justify-between pb-3 mb-4 border-b border-vault-800">
+                <div class="flex items-center space-x-2">
+                  <i data-lucide="clipboard-check" class="w-5 h-5 text-emerald-400"></i>
+                  <h2 class="text-base font-bold text-white">Verified Submissions Ledger</h2>
+                </div>
+                <button onclick="refreshTeacherLedger()" class="p-1.5 rounded-lg bg-vault-800 hover:bg-vault-700 text-gray-300 text-xs flex items-center space-x-1">
+                  <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                  <span>Refresh</span>
+                </button>
+              </div>
+
+              <!-- Table -->
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead>
+                    <tr class="text-gray-400 font-mono border-b border-vault-800">
+                      <th class="pb-2">Student ID</th>
+                      <th class="pb-2">Score</th>
+                      <th class="pb-2">Timestamp</th>
+                      <th class="pb-2">Cryptographic Signature</th>
+                      <th class="pb-2">Tamper Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="submissions-table-body" class="divide-y divide-vault-800/60 font-mono">
+                    <tr>
+                      <td colspan="5" class="py-6 text-center text-gray-500 font-sans">
+                        No submissions recorded yet. Take the exam in the Student tab to see real-time verification!
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Sync & Conflict Audit Log -->
+            <div class="bg-vault-900 border border-vault-700/80 rounded-2xl p-5 shadow-xl">
+              <div class="flex items-center space-x-2 mb-3">
+                <i data-lucide="git-merge" class="w-4 h-4 text-purple-400"></i>
+                <h3 class="text-sm font-bold text-white">Live CRDT Conflict Resolution Log</h3>
+              </div>
+              <div id="conflict-log-container" class="space-y-2 max-h-40 overflow-y-auto font-mono text-[11px]">
+                <div class="text-gray-500 p-2 rounded bg-vault-950 border border-vault-800">
+                  Engine active. Ready to intercept stale or concurrent offline updates.
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 4: CRDT & SYNC SANDBOX                                                -->
+    <!-- ========================================================================= -->
+    <section id="tab-lab" class="tab-content hidden">
+      <div class="bg-vault-900 border border-vault-700/80 rounded-3xl p-6 sm:p-8 shadow-2xl">
+        <div class="max-w-3xl">
+          <span class="text-xs font-mono font-bold text-purple-400 uppercase tracking-wider">Technical Deep-Dive</span>
+          <h2 class="text-xl sm:text-2xl font-bold text-white mt-1">Interactive Conflict Resolution & Idempotency Engine</h2>
+          <p class="text-sm text-gray-300 mt-2 leading-relaxed">
+            ExamVault solves two of the hardest distributed systems problems in hackathon criteria: <strong>deterministic offline state reconciliation (CRDT / Lamport Clocks)</strong> and <strong>guaranteed exactly-once submission (Cryptographic Idempotency Nonces)</strong>.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+          
+          <!-- Interactive Playground: CRDT Last-Write-Wins Conflict -->
+          <div class="bg-vault-950 border border-vault-800 rounded-2xl p-5">
+            <h3 class="text-sm font-bold text-vault-cyan mb-2 flex items-center space-x-2">
+              <i data-lucide="git-commit" class="w-4 h-4"></i>
+              <span>CRDT / Lamport Clock Resolution Demo</span>
+            </h3>
+            <p class="text-xs text-gray-400 mb-4">Simulate 2 conflicting offline answer updates to Question 1:</p>
+            
+            <div class="space-y-3">
+              <div class="p-3 bg-vault-900 rounded-xl border border-vault-800 text-xs">
+                <div class="text-amber-400 font-mono font-bold mb-1">Device State A (Offline at T1):</div>
+                <div class="text-gray-300">Selected: <strong>Option B</strong> | Lamport Clock: <strong>14</strong></div>
+              </div>
+              <div class="p-3 bg-vault-900 rounded-xl border border-vault-800 text-xs">
+                <div class="text-blue-400 font-mono font-bold mb-1">Server / Device State B (Offline at T2):</div>
+                <div class="text-gray-300">Selected: <strong>Option C</strong> | Lamport Clock: <strong>18</strong></div>
+              </div>
+              <button onclick="testConflictResolutionLab()" class="w-full py-2 rounded-xl bg-vault-800 hover:bg-vault-700 text-vault-cyan border border-vault-cyan/30 text-xs font-mono font-bold transition">
+                ⚡ Execute Conflict Resolution Algorithm
+              </button>
+              <div id="crdt-lab-result" class="p-3 bg-vault-900 rounded-xl border border-vault-700 text-xs font-mono text-emerald-400 hidden">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Playground: Idempotent Submission Guard -->
+          <div class="bg-vault-950 border border-vault-800 rounded-2xl p-5">
+            <h3 class="text-sm font-bold text-purple-400 mb-2 flex items-center space-x-2">
+              <i data-lucide="shield-alert" class="w-4 h-4"></i>
+              <span>Exactly-Once Idempotency Guard</span>
+            </h3>
+            <p class="text-xs text-gray-400 mb-4">Simulate a student experiencing network stutter and furiously clicking "Submit" 5 times:</p>
+            
+            <div class="space-y-3">
+              <div class="p-3 bg-vault-900 rounded-xl border border-vault-800 text-xs font-mono">
+                <div class="text-gray-400">Generated Nonce: <span class="text-purple-400">IDEMP-9a8c1f0b</span></div>
+                <div class="text-gray-400 mt-1">Status: <span class="text-emerald-400">Atomic Server Lock Ready</span></div>
+              </div>
+              <button onclick="testSpamSubmitLab()" class="w-full py-2 rounded-xl bg-vault-800 hover:bg-vault-700 text-purple-400 border border-purple-500/30 text-xs font-mono font-bold transition">
+                🚀 Fire 5 Simultaneous Submissions
+              </button>
+              <div id="idemp-lab-result" class="p-3 bg-vault-900 rounded-xl border border-vault-700 text-xs font-mono text-gray-300 hidden">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- LOCAL VAULT INSPECTOR SLIDE-OVER DRAWER                                   -->
+  <!-- ========================================================================= -->
+  <div id="vault-drawer" class="fixed inset-y-0 right-0 w-full max-w-md bg-vault-950 border-l border-vault-700 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+    <div class="p-4 border-b border-vault-800 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <i data-lucide="database" class="w-5 h-5 text-vault-cyan"></i>
+        <h3 class="text-sm font-bold text-white">Local IndexedDB Vault Inspector</h3>
+      </div>
+      <button onclick="toggleVaultDrawer()" class="p-1.5 rounded-lg bg-vault-800 text-gray-400 hover:text-white">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <div class="p-4 flex-1 overflow-y-auto space-y-4 text-xs font-mono">
+      <div class="p-3 bg-vault-900 rounded-xl border border-vault-800">
+        <span class="text-gray-400 text-[10px] block mb-1">STORAGE ENGINE:</span>
+        <span class="text-emerald-400 font-bold">IndexedDB: 'ExamVault_Store'</span>
+      </div>
+
+      <div class="p-3 bg-vault-900 rounded-xl border border-vault-800">
+        <span class="text-gray-400 text-[10px] block mb-1">ENCRYPTION CIPHER:</span>
+        <span class="text-vault-cyan font-bold">AES-GCM (WebCrypto API, 256-bit key)</span>
+      </div>
+
+      <div class="p-3 bg-vault-900 rounded-xl border border-vault-800">
+        <span class="text-gray-400 text-[10px] block mb-1">RAW ENCRYPTED PAYLOAD ON DEVICE:</span>
+        <div id="drawer-encrypted-preview" class="text-gray-400 text-[10px] break-all max-h-24 overflow-y-auto bg-vault-950 p-2 rounded border border-vault-800">
+          U2FsdGVkX19k8x92mKq4...
+        </div>
+      </div>
+
+      <div class="p-3 bg-vault-900 rounded-xl border border-vault-800">
+        <span class="text-gray-400 text-[10px] block mb-1">DECRYPTED RUNTIME STATE:</span>
+        <pre id="drawer-decrypted-preview" class="text-emerald-400 text-[10px] overflow-x-auto bg-vault-950 p-2 rounded border border-vault-800">
+{}
+        </pre>
+      </div>
+
+      <div class="p-3 bg-vault-900 rounded-xl border border-vault-800">
+        <span class="text-gray-400 text-[10px] block mb-1">PENDING SYNC QUEUE:</span>
+        <div id="drawer-queue-preview" class="text-amber-400 text-[10px]">
+          0 changes waiting for sync
+        </div>
+      </div>
+    </div>
+
+    <div class="p-4 border-t border-vault-800">
+      <button onclick="clearLocalVault()" class="w-full py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-bold transition">
+        Wipe Local Vault (For Fresh Test)
+      </button>
+    </div>
+  </div>
+
+  <!-- Custom Alert / Toast Modal -->
+  <div id="toast-modal" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div id="toast-inner" class="bg-vault-850 border border-vault-cyan/50 text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 text-xs">
+      <i id="toast-icon" data-lucide="info" class="w-4 h-4 text-vault-cyan"></i>
+      <span id="toast-message" class="font-medium">Notification</span>
+    </div>
+  </div>
+
+  <!-- Client-side Logic Scripts -->
+  <script src="/app.js"></script>
+</body>
+</html>
